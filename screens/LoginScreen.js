@@ -8,23 +8,35 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../database/firebase";
+import useAuth from "../hooks/useAuth";
 
 const LoginScreen = () => {
   const [type, setType] = useState("login");
+
+  const { loading, setLoading } = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    setEmail("");
+    setPassword("");
+    setName("");
+  }, [type]);
 
   const signin = () => {
     if (email.trim() === "" || password.trim() === "") {
       return Alert.alert("Error", "Please fill all the fields");
     }
+    setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(({ user }) => {
-        console.log("login");
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false);
         if (error.message === "Firebase: Error (auth/invalid-credential).") {
           Alert.alert("Error", "Invalid Credentials");
         } else {
@@ -37,22 +49,28 @@ const LoginScreen = () => {
     if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
       return Alert.alert("Error", "Please fill all the fields");
     }
+    setLoading(true);
     createUserWithEmailAndPassword(auth, email, password)
       .then(({ user }) => {
         updateProfile(user, { displayName: name });
-        console.log(user);
+        setLoading(false);
+        setType("login");
       })
       .catch((error) => {
-        console.log(error);
+        setLoading(false);
         Alert.alert("Error", error.message);
       });
   };
 
-  useEffect(() => {
-    setEmail("");
-    setPassword("");
-    setName("");
-  }, [type]);
+  if (loading) {
+    return (
+      <View style={tw.style("flex-1 justify-center items-center")}>
+        <Text style={tw.style("font-semibold text-red-400 text-2xl")}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground

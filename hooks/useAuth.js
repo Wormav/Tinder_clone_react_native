@@ -6,8 +6,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState();
-  const [loadingInitial, setloadingInitial] = useState(true);
-  const [loading, setloading] = useState(false);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -16,8 +16,8 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-      setloadingInitial(false);
-      setloading(false);
+      setLoadingInitial(false);
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const memoedValue = useMemo(() => {
-    return { user, setUser, loading, setloading, logout };
+    return { user, setUser, loading, setLoading, logout };
   }, [user, loading]);
 
   return (
